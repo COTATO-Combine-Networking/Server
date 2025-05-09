@@ -1,6 +1,6 @@
-package COTATO_Combine_Networking.Networking.domain.entity;
+package COTATO_Combine_Networking.Networking.domain.temp.entity;
 
-import COTATO_Combine_Networking.Networking.domain.enums.PostCategory;
+import COTATO_Combine_Networking.Networking.domain.temp.enums.PostCategory;
 import COTATO_Combine_Networking.Networking.global.entity.BaseTimeEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

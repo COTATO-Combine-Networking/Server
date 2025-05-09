@@ -1,8 +1,8 @@
-package COTATO_Combine_Networking.Networking.domain.dto.response;
+package COTATO_Combine_Networking.Networking.domain.temp.dto.response;
 
 import java.time.LocalDateTime;
 
-import COTATO_Combine_Networking.Networking.domain.enums.PostCategory;
+import COTATO_Combine_Networking.Networking.domain.temp.enums.PostCategory;
 import lombok.Builder;
 import lombok.Getter;
 

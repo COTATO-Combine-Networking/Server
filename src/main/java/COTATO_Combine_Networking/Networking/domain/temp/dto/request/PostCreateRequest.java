@@ -1,6 +1,6 @@
-package COTATO_Combine_Networking.Networking.domain.dto.request;
+package COTATO_Combine_Networking.Networking.domain.temp.dto.request;
 
-import COTATO_Combine_Networking.Networking.domain.enums.PostCategory;
+import COTATO_Combine_Networking.Networking.domain.temp.enums.PostCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

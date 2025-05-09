@@ -1,13 +1,13 @@
-package COTATO_Combine_Networking.Networking.domain.controller;
+package COTATO_Combine_Networking.Networking.domain.temp.controller;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import COTATO_Combine_Networking.Networking.domain.dto.request.PostCreateRequest;
-import COTATO_Combine_Networking.Networking.domain.dto.response.PostResponse;
-import COTATO_Combine_Networking.Networking.domain.service.PostService;
+import COTATO_Combine_Networking.Networking.domain.temp.dto.request.PostCreateRequest;
+import COTATO_Combine_Networking.Networking.domain.temp.dto.response.PostResponse;
+import COTATO_Combine_Networking.Networking.domain.temp.service.PostService;
 import COTATO_Combine_Networking.Networking.global.apiPayload.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

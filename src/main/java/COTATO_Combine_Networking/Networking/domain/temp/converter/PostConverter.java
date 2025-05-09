@@ -1,8 +1,8 @@
-package COTATO_Combine_Networking.Networking.domain.converter;
+package COTATO_Combine_Networking.Networking.domain.temp.converter;
 
-import COTATO_Combine_Networking.Networking.domain.dto.request.PostCreateRequest;
-import COTATO_Combine_Networking.Networking.domain.dto.response.PostResponse;
-import COTATO_Combine_Networking.Networking.domain.entity.Post;
+import COTATO_Combine_Networking.Networking.domain.temp.dto.request.PostCreateRequest;
+import COTATO_Combine_Networking.Networking.domain.temp.dto.response.PostResponse;
+import COTATO_Combine_Networking.Networking.domain.temp.entity.Post;
 
 public class PostConverter {
     public static Post toEntity(PostCreateRequest request) {
