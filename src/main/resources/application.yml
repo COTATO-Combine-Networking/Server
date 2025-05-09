@@ -18,7 +18,6 @@ spring:
           auto: none
         default_batch_fetch_size: 1000
 
-
 springdoc:
   swagger-ui:
     path: /
