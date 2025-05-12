@@ -53,7 +53,7 @@ public class PlaceController {
     }
 
     /* 위치 상세 조회 (위도, 경도 기반 날씨)
-    @GetMapping("/{placeId}")
+    @GetMapping("/{placeId}/detail")
     public ResponseEntity<WeatherResponse> getPlaceWeather(@PathVariable Long placeId) {
         WeatherResponse weather = placeService.getWeatherForPlace(placeId);
         return ResponseEntity.ok(weather);
