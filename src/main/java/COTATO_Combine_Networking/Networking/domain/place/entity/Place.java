@@ -26,12 +26,20 @@ public class Place extends BaseTimeEntity {
 
     private String latitude; // y (위도)
 
+    @Column(nullable = false)
+    private boolean isPinned = false;
+
+    public void setPinned(boolean pinned) {
+        this.isPinned = pinned;
+    }
+
     @Builder
-    public Place(String placeName, String addressName, String roadAddressName, String longitude, String latitude) {
+    public Place(String placeName, String addressName, String roadAddressName, String longitude, String latitude, boolean isPinned) {
         this.placeName = placeName;
         this.addressName = addressName;
         this.roadAddressName = roadAddressName;
         this.longitude = longitude;
         this.latitude = latitude;
+        this.isPinned = isPinned;
     } ;
 }
