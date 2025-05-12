@@ -1,7 +1,7 @@
 package COTATO_Combine_Networking.Networking.domain.place.converter;
 
 import COTATO_Combine_Networking.Networking.domain.place.dto.request.PlaceCreateRequest;
-import COTATO_Combine_Networking.Networking.domain.place.dto.response.PlaceCreateResponse;
+import COTATO_Combine_Networking.Networking.domain.place.dto.response.PlaceResponse;
 import COTATO_Combine_Networking.Networking.domain.place.entity.Place;
 
 public class PlaceConverter {
@@ -13,12 +13,10 @@ public class PlaceConverter {
                 .build();
     }
 
-    public static PlaceCreateResponse toResponse(Place place) {
-        return PlaceCreateResponse.builder()
+    public static PlaceResponse toResponse(Place place) {
+        return PlaceResponse.builder()
                 .placeId(place.getId())
                 .placeName(place.getPlaceName())
-                .latitude(place.getLatitude())
-                .longitude(place.getLongitude())
                 .build();
     }
 }

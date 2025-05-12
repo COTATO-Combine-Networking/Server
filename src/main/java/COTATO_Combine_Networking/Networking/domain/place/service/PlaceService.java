@@ -2,13 +2,14 @@ package COTATO_Combine_Networking.Networking.domain.place.service;
 
 import COTATO_Combine_Networking.Networking.domain.place.converter.PlaceConverter;
 import COTATO_Combine_Networking.Networking.domain.place.dto.request.PlaceCreateRequest;
-import COTATO_Combine_Networking.Networking.domain.place.dto.response.PlaceCreateResponse;
+import COTATO_Combine_Networking.Networking.domain.place.dto.response.PlaceResponse;
 import COTATO_Combine_Networking.Networking.domain.place.entity.Place;
 import COTATO_Combine_Networking.Networking.domain.place.repository.PlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +17,7 @@ public class PlaceService {
 
     private final PlaceRepository placeRepository;
 
-    public PlaceCreateResponse save(PlaceCreateRequest request) {
+    public PlaceResponse save(PlaceCreateRequest request) {
         Place place = PlaceConverter.toEntity(request);
         placeRepository.save(place);
         return PlaceConverter.toResponse(place);
@@ -27,8 +28,10 @@ public class PlaceService {
         return "Place ID " + placeId + " deleted successfully";
     }
 
-    public List<Place> findAll() {
-        return placeRepository.findAll();
+    public List<PlaceResponse> findAll() {
+        return placeRepository.findAll().stream()
+                .map(place -> new PlaceResponse(place.getId(), place.getPlaceName()))
+                .collect(Collectors.toList());
     }
 
     public String pin(Long placeId) {
