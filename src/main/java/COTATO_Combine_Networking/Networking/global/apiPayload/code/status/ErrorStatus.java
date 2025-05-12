@@ -26,8 +26,13 @@ public enum ErrorStatus implements BaseErrorCode {
 	DUPLICATE_USERNAME(HttpStatus.BAD_REQUEST, "4001", "이미 존재하는 사용자입니다."),
 	USER_NOT_FOUND(HttpStatus.BAD_REQUEST, "4002", "사용자를 찾을 수 없습니다."),
 	INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "4003", "비밀번호가 일치하지 않습니다."),
-	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "4004", "로그인이 필요합니다.");
+	UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "4004", "로그인이 필요합니다."),
 
+	// 장소 관련 에러
+	PLACE_ALREADY_EXISTS(HttpStatus.CONFLICT, "2001", "이미 등록된 장소입니다."),
+	PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "2002", "존재하지 않는 장소입니다."),
+	ALREADY_PINNED(HttpStatus.BAD_REQUEST, "2003", "이미 즐겨찾기된 장소입니다."),
+	ALREADY_UNPINNED(HttpStatus.BAD_REQUEST, "2004", "이미 즐겨찾기가 해제된 장소입니다.");
 
 
 	private final HttpStatus httpStatus;
