@@ -44,7 +44,7 @@ public class PlaceService {
 
     public List<PlaceResponse> findAll() {
         return placeRepository.findAll().stream()
-                .map(place -> new PlaceResponse(place.getId(), place.getPlaceName()))
+                .map(place -> new PlaceResponse(place.getId(), place.getPlaceName(), place.getAddressName()))
                 .collect(Collectors.toList());
     }
 

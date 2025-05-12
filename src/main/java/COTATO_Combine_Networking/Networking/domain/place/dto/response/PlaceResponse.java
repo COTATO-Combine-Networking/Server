@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class PlaceResponse {
     private Long placeId;
     private String placeName;
+    private String placeAddress;
 }
