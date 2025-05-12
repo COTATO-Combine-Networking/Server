@@ -2,7 +2,6 @@ package COTATO_Combine_Networking.Networking.domain.place.controller;
 
 import COTATO_Combine_Networking.Networking.domain.place.dto.request.PlaceCreateRequest;
 import COTATO_Combine_Networking.Networking.domain.place.dto.response.PlaceResponse;
-import COTATO_Combine_Networking.Networking.domain.place.entity.Place;
 import COTATO_Combine_Networking.Networking.domain.place.service.PlaceService;
 import COTATO_Combine_Networking.Networking.global.apiPayload.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
