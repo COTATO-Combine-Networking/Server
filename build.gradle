@@ -54,3 +54,8 @@ tasks.withType(JavaCompile) {
 clean.doLast {
 	file(querydslDir).deleteDir()
 }
+
+bootJar {
+	mainClass = 'COTATO_Combine_Networking.Networking.NetworkingApplication'
+	archiveFileName = 'Networking-0.0.1-SNAPSHOT.jar'
+}
