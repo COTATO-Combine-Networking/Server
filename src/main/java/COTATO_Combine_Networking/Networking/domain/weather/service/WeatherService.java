@@ -7,6 +7,7 @@ import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherF
 import COTATO_Combine_Networking.Networking.global.apiPayload.code.status.ErrorStatus;
 import COTATO_Combine_Networking.Networking.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,19 +24,25 @@ public class WeatherService {
 
     private final RestTemplate restTemplate;
 
-    private static final String API_KEY = "d364b0258b887a52cfd560c72aef20ac";
-    private static final String BASE_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
-    private static final String BASE_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather";
+    @Value("${weather.api-key}")
+    private String apiKey;
+
+    @Value("${weather.forecast-url}")
+    private String forecastUrl;
+
+    @Value("${weather.current-url}")
+    private String currentUrl;
+
 
     private String buildUrl(String baseUrl) {
-        return baseUrl + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
+        return baseUrl + "?lat=37.5665&lon=126.9780&appid=" + apiKey + "&units=metric&lang=kr";
     }
 
     public List<DailyWeatherSummary> getFiveDayForecast() {
 
         // Forecast API 호출
-        String forecastUrl = buildUrl(BASE_FORECAST_URL);
-        WeatherForecastResponse forecastResponse = restTemplate.getForObject(forecastUrl, WeatherForecastResponse.class);
+        String forecastRequestUrl = buildUrl(this.forecastUrl);
+        WeatherForecastResponse forecastResponse = restTemplate.getForObject(forecastRequestUrl, WeatherForecastResponse.class);
 
         if (forecastResponse == null) {
             throw new GeneralException(ErrorStatus.API_RESPONSE_EMPTY);
@@ -73,8 +80,8 @@ public class WeatherService {
 
             // 오전 데이터가 없고 오늘이면 current API 호출, 강수확률은 pm에서
             if (date.equals(today.toString())&& am.isEmpty()) {
-                String currentUrl = buildUrl(BASE_CURRENT_URL);
-                WeatherCurrentResponse currentResponse = restTemplate.getForObject(currentUrl, WeatherCurrentResponse.class);
+                String currentRequestUrl = buildUrl(currentUrl);
+                WeatherCurrentResponse currentResponse = restTemplate.getForObject(currentRequestUrl, WeatherCurrentResponse.class);
 
                 if (currentResponse == null) {
                     throw new GeneralException(ErrorStatus.API_RESPONSE_EMPTY);
@@ -117,7 +124,7 @@ public class WeatherService {
                 .map(i -> i.getWeather().get(0).getMain())
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
-                .max(Map.Entry.comparingByValue())
+                .max(Map.Entry.comparingByValue()) // 최빈값
                 .map(Map.Entry::getKey)
                 .orElse("정보 없음");
     }

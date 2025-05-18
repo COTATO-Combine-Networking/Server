@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/cotato2
-    username: root
-    password: yujin0320
+    url: ${DB_URL}
+    username: ${USER}
+    password: ${PW}
     driver-class-name: com.mysql.cj.jdbc.Driver
   sql:
     init:
@@ -21,3 +21,8 @@ spring:
 springdoc:
   swagger-ui:
     path: /
+
+weather:
+  api-key: d364b0258b887a52cfd560c72aef20ac
+  forecast-url: https://api.openweathermap.org/data/2.5/forecast
+  current-url: https://api.openweathermap.org/data/2.5/weather
