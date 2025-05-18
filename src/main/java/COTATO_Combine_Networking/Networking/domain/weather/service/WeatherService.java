@@ -4,6 +4,8 @@ import COTATO_Combine_Networking.Networking.domain.weather.dto.response.DailyWea
 import COTATO_Combine_Networking.Networking.domain.weather.dto.response.HalfDayWeather;
 import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherCurrentResponse;
 import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherForecastResponse;
+import COTATO_Combine_Networking.Networking.global.apiPayload.code.status.ErrorStatus;
+import COTATO_Combine_Networking.Networking.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -36,6 +38,10 @@ public class WeatherService {
         // Forecast API 호출
         String forecastUrl = buildUrl(BASE_FORECAST_URL);
         WeatherForecastResponse forecastResponse = restTemplate.getForObject(forecastUrl, WeatherForecastResponse.class);
+
+        if (forecastResponse == null) {
+            throw new GeneralException(ErrorStatus.API_RESPONSE_EMPTY);
+        }
 
         // 날짜별로 그룹화(ex-"2025-05-20")
         Map<String, List<WeatherForecastResponse.WeatherItem>> grouped = forecastResponse.getList().stream()
@@ -70,13 +76,17 @@ public class WeatherService {
             // 오전 데이터가 없고 오늘이면 current API 호출, 강수확률은 pm에서
             if (date.equals(today.toString())&& am.isEmpty()) {
                 String currentUrl = buildUrl(BASE_CURRENT_URL);
-                WeatherCurrentResponse current = restTemplate.getForObject(currentUrl, WeatherCurrentResponse.class);
+                WeatherCurrentResponse currentResponse = restTemplate.getForObject(currentUrl, WeatherCurrentResponse.class);
+
+                if (currentResponse == null) {
+                    throw new GeneralException(ErrorStatus.API_RESPONSE_EMPTY);
+                }
 
                 double pop = summarizeHalfDay(pm).getPop();
 
                 amWeather = new HalfDayWeather(
-                        current.getWeather().get(0).getMain(),
-                        current.getMain().getTemp(),
+                        currentResponse.getWeather().get(0).getMain(),
+                        currentResponse.getMain().getTemp(),
                         pop
                 );
             } else {
