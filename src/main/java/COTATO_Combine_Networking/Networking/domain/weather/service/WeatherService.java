@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,11 +62,11 @@ public class WeatherService {
             List<WeatherForecastResponse.WeatherItem> items = grouped.get(date);
 
             List<WeatherForecastResponse.WeatherItem> am = items.stream()
-                    .filter(i -> getHour(i) < 12) // 오전
+                    .filter(i -> i.getHour() < 12) // 오전
                     .toList();
 
             List<WeatherForecastResponse.WeatherItem> pm = items.stream()
-                    .filter(i -> getHour(i) >= 12) // 오후
+                    .filter(i -> i.getHour() >= 12) // 오후
                     .toList();
 
             HalfDayWeather amWeather;
@@ -103,30 +101,39 @@ public class WeatherService {
         return summaries;
     }
 
-    private int getHour(WeatherForecastResponse.WeatherItem item) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime dt = LocalDateTime.parse(item.getDt_txt(), formatter);
-        return dt.getHour();
-    }
-
+    // 날씨 요약 정보 계산
     private HalfDayWeather summarizeHalfDay(List<WeatherForecastResponse.WeatherItem> items) {
         if (items.isEmpty()) return new HalfDayWeather("정보 없음", 0, 0);
 
-        double avgTemp = items.stream().mapToDouble(i -> i.getMain().getTemp()).average().orElse(0);
+        return new HalfDayWeather(
+                mostFrequentWeather(items),
+                averageTemp(items),
+                averagePop(items)
+        );
+    }
 
-        double avgPop = items.stream()
-                .mapToDouble(i -> i.getPop() * 100)  //% 변환
-                .average()
-                .orElse(0);
-
-        String mostCommonWeather = items.stream()
-                .map(i -> i.getWeather().get(0).getMain())  // 날씨 상태(main)를 꺼냄
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())) // 각 상태별 개수 계산
+    private String mostFrequentWeather(List<WeatherForecastResponse.WeatherItem> items) {
+        return items.stream()
+                .map(i -> i.getWeather().get(0).getMain())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                 .entrySet().stream()
-                .max(Map.Entry.comparingByValue()) // 최빈값
+                .max(Map.Entry.comparingByValue())
                 .map(Map.Entry::getKey)
                 .orElse("정보 없음");
-
-        return new HalfDayWeather(mostCommonWeather, avgTemp, avgPop);
     }
+
+    private double averageTemp(List<WeatherForecastResponse.WeatherItem> items) {
+        return items.stream()
+                .mapToDouble(i -> i.getMain().getTemp())
+                .average()
+                .orElse(0);
+    }
+
+    private double averagePop(List<WeatherForecastResponse.WeatherItem> items) {
+        return items.stream()
+                .mapToDouble(i -> i.getPop() * 100) // % 변환
+                .average()
+                .orElse(0);
+    }
+
 }

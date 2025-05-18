@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -20,6 +22,12 @@ public class WeatherForecastResponse {
         private List<Weather> weather;
         private double pop; // 0.0 ~ 1.0
         private String dt_txt;
+
+        public int getHour() {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime dt = LocalDateTime.parse(this.dt_txt, formatter);
+            return dt.getHour();
+        }
     }
 
     @Data
@@ -36,5 +44,6 @@ public class WeatherForecastResponse {
         private String main;
         private String description;
     }
+
 }
 

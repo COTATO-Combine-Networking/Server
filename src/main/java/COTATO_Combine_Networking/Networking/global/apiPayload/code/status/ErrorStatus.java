@@ -35,7 +35,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	ALREADY_UNPINNED(HttpStatus.BAD_REQUEST, "2004", "이미 즐겨찾기가 해제된 장소입니다."),
 
 	// 날씨 관련 에러
-	API_RESPONSE_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, "5000", "API 응답이 없습니다.");
+	API_RESPONSE_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, "5000", "날씨 예보 데이터가 없습니다.");
 
 
 
