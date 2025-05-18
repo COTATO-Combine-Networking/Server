@@ -18,15 +18,20 @@ import java.util.stream.Collectors;
 @Service
 public class WeatherService {
 
+    private final RestTemplate restTemplate;
+
     private final String API_KEY = "d364b0258b887a52cfd560c72aef20ac";
     private final String BASE_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
     private final String BASE_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather";
 
+    private String buildUrl(String baseUrl) {
+        return baseUrl + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
+    }
+
     public List<DailyWeatherSummary> getFiveDayForecast() {
-        RestTemplate restTemplate = new RestTemplate();
 
         // Forecast API 호출
-        String forecastUrl = BASE_FORECAST_URL + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
+        String forecastUrl = buildUrl(BASE_FORECAST_URL);
         WeatherForecastResponse forecastResponse = restTemplate.getForObject(forecastUrl, WeatherForecastResponse.class);
 
         // 날짜별로 그룹화(ex-"2025-05-20")
@@ -61,7 +66,7 @@ public class WeatherService {
 
             // 오전 데이터가 없고 오늘이면 current API 호출, 강수확률은 pm에서
             if (date.equals(today.toString())&& am.isEmpty()) {
-                String currentUrl = BASE_CURRENT_URL + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
+                String currentUrl = buildUrl(BASE_CURRENT_URL);
                 WeatherCurrentResponse current = restTemplate.getForObject(currentUrl, WeatherCurrentResponse.class);
 
                 double pop = summarizeHalfDay(pm).getPop();
