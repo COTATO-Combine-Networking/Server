@@ -17,23 +17,34 @@ import java.util.stream.Collectors;
 public class WeatherService {
 
     private final String API_KEY = "d364b0258b887a52cfd560c72aef20ac";
-    private final String BASE_URL = "https://api.openweathermap.org/data/2.5/forecast";
-
+    private final String BASE_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
+    private final String BASE_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather";
 
     public List<WeatherResponse.DailyWeatherSummary> getFiveDayForecast() {
         RestTemplate restTemplate = new RestTemplate();
-        String url = BASE_URL + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
 
-        WeatherRequest.ForecastResponse response = restTemplate.getForObject(url, WeatherRequest.ForecastResponse.class);
+        // Forecast 가져오기
+        String forecastUrl = BASE_FORECAST_URL + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
+        WeatherRequest.ForecastResponse response = restTemplate.getForObject(forecastUrl, WeatherRequest.ForecastResponse.class);
 
-        // 날짜별 데이터 그룹화
+        // 날짜별로 그룹화
         Map<String, List<WeatherRequest.WeatherItem>> grouped = response.getList().stream()
                 .collect(Collectors.groupingBy(item -> item.getDt_txt().substring(0, 10)));
 
-        /*
+        LocalDate today = LocalDate.now();
+
+        // 오늘부터 이후 5일만 필터링
+        List<String> targetDates = grouped.keySet().stream()
+                .map(LocalDate::parse)
+                .filter(date -> !date.isBefore(today))
+                .sorted()
+                .limit(5)
+                .map(LocalDate::toString)
+                .toList();
+
         List<WeatherResponse.DailyWeatherSummary> summaries = new ArrayList<>();
 
-        for (String date : grouped.keySet().stream().sorted().limit(5).toList()) {
+        for (String date : targetDates) {
             List<WeatherRequest.WeatherItem> items = grouped.get(date);
 
             // 오전
@@ -46,44 +57,31 @@ public class WeatherService {
                     .filter(i -> getHour(i) >= 12)
                     .toList();
 
-            summaries.add(new WeatherResponse.DailyWeatherSummary(
-                    date,
-                    summarizeHalfDay(am),
-                    summarizeHalfDay(pm)
-            ));
-        }*/
+            WeatherResponse.HalfDayWeather amWeather;
 
-        LocalDate today = LocalDate.now();
+            // 오전 데이터가 없고 오늘이면, 현재 날씨로 대체하고 강수확률은 pm에서
+            if (date.equals(today.toString())&& am.isEmpty()) {
+                String currentUrl = BASE_CURRENT_URL + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
+                WeatherRequest.CurrentWeather current = restTemplate.getForObject(currentUrl, WeatherRequest.CurrentWeather.class);
 
-        // 오늘부터 이후 5일만 필터링
-        List<String> targetDates = grouped.keySet().stream()
-                .map(LocalDate::parse)
-                .filter(date -> !date.isBefore(today)) // 오늘 이후
-                .sorted()
-                .limit(5)
-                .map(LocalDate::toString)
-                .toList();
+                // pm의 강수확률
+                double pop = summarizeHalfDay(pm).getPop();
 
-        List<WeatherResponse.DailyWeatherSummary> summaries = new ArrayList<>();
-
-        for (String date : targetDates) {
-            List<WeatherRequest.WeatherItem> items = grouped.get(date);
-
-            List<WeatherRequest.WeatherItem> am = items.stream()
-                    .filter(i -> getHour(i) < 12)
-                    .toList();
-
-            List<WeatherRequest.WeatherItem> pm = items.stream()
-                    .filter(i -> getHour(i) >= 12)
-                    .toList();
+                amWeather = new WeatherResponse.HalfDayWeather(
+                        current.getWeather().get(0).getMain(),
+                        current.getMain().getTemp(),
+                        pop
+                );
+            } else {
+                amWeather = summarizeHalfDay(am);
+            }
 
             summaries.add(new WeatherResponse.DailyWeatherSummary(
                     date,
-                    summarizeHalfDay(am),
+                    amWeather,
                     summarizeHalfDay(pm)
             ));
         }
-
 
         return summaries;
     }
@@ -97,9 +95,8 @@ public class WeatherService {
 
         double avgTemp = items.stream().mapToDouble(i -> i.getMain().getTemp()).average().orElse(0);
         double avgPop = items.stream().mapToDouble(i -> i.getPop() * 100).average().orElse(0);
-        String mostCommonWeather = items.get(0).getWeather().get(0).getMain(); // 간단히 첫 번째로
+        String mostCommonWeather = items.get(0).getWeather().get(0).getMain();
 
         return new WeatherResponse.HalfDayWeather(mostCommonWeather, avgTemp, avgPop);
     }
 }
-

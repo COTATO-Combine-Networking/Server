@@ -39,4 +39,54 @@ public class WeatherRequest {
         private String description;
     }
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CurrentWeather {
+        private Main main;
+        private List<Weather> weather;
+
+        // getters/setters
+
+        public Main getMain() {
+            return main;
+        }
+
+        public void setMain(Main main) {
+            this.main = main;
+        }
+
+        public List<Weather> getWeather() {
+            return weather;
+        }
+
+        public void setWeather(List<Weather> weather) {
+            this.weather = weather;
+        }
+
+        public static class Main {
+            private double temp;
+
+            public double getTemp() {
+                return temp;
+            }
+
+            public void setTemp(double temp) {
+                this.temp = temp;
+            }
+        }
+
+        public static class Weather {
+            private String main;
+
+            public String getMain() {
+                return main;
+            }
+
+            public void setMain(String main) {
+                this.main = main;
+            }
+        }
+    }
+
 }
