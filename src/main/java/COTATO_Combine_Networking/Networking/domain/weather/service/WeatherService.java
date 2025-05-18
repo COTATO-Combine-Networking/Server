@@ -9,9 +9,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -20,9 +23,9 @@ public class WeatherService {
 
     private final RestTemplate restTemplate;
 
-    private final String API_KEY = "d364b0258b887a52cfd560c72aef20ac";
-    private final String BASE_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
-    private final String BASE_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather";
+    private static final String API_KEY = "d364b0258b887a52cfd560c72aef20ac";
+    private static final String BASE_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
+    private static final String BASE_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather";
 
     private String buildUrl(String baseUrl) {
         return baseUrl + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
@@ -91,15 +94,28 @@ public class WeatherService {
     }
 
     private int getHour(WeatherForecastResponse.WeatherItem item) {
-        return Integer.parseInt(item.getDt_txt().substring(11, 13));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dt = LocalDateTime.parse(item.getDt_txt(), formatter);
+        return dt.getHour();
     }
 
     private HalfDayWeather summarizeHalfDay(List<WeatherForecastResponse.WeatherItem> items) {
         if (items.isEmpty()) return new HalfDayWeather("정보 없음", 0, 0);
 
         double avgTemp = items.stream().mapToDouble(i -> i.getMain().getTemp()).average().orElse(0);
-        double avgPop = items.stream().mapToDouble(i -> i.getPop() * 100).average().orElse(0);
-        String mostCommonWeather = items.get(0).getWeather().get(0).getMain();
+
+        double avgPop = items.stream()
+                .mapToDouble(i -> i.getPop() * 100)  //% 변환
+                .average()
+                .orElse(0);
+
+        String mostCommonWeather = items.stream()
+                .map(i -> i.getWeather().get(0).getMain())  // 날씨 상태(main)를 꺼냄
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting())) // 각 상태별 개수 계산
+                .entrySet().stream()
+                .max(Map.Entry.comparingByValue()) // 최빈값
+                .map(Map.Entry::getKey)
+                .orElse("정보 없음");
 
         return new HalfDayWeather(mostCommonWeather, avgTemp, avgPop);
     }
