@@ -1,7 +1,9 @@
 package COTATO_Combine_Networking.Networking.domain.weather.service;
 
-import COTATO_Combine_Networking.Networking.domain.weather.dto.request.WeatherRequest;
-import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherResponse;
+import COTATO_Combine_Networking.Networking.domain.weather.dto.response.DailyWeatherSummary;
+import COTATO_Combine_Networking.Networking.domain.weather.dto.response.HalfDayWeather;
+import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherCurrentResponse;
+import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherForecastResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,15 +22,15 @@ public class WeatherService {
     private final String BASE_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
     private final String BASE_CURRENT_URL = "https://api.openweathermap.org/data/2.5/weather";
 
-    public List<WeatherResponse.DailyWeatherSummary> getFiveDayForecast() {
+    public List<DailyWeatherSummary> getFiveDayForecast() {
         RestTemplate restTemplate = new RestTemplate();
 
-        // Forecast 가져오기
+        // Forecast API 호출
         String forecastUrl = BASE_FORECAST_URL + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
-        WeatherRequest.ForecastResponse response = restTemplate.getForObject(forecastUrl, WeatherRequest.ForecastResponse.class);
+        WeatherForecastResponse forecastResponse = restTemplate.getForObject(forecastUrl, WeatherForecastResponse.class);
 
-        // 날짜별로 그룹화
-        Map<String, List<WeatherRequest.WeatherItem>> grouped = response.getList().stream()
+        // 날짜별로 그룹화(ex-"2025-05-20")
+        Map<String, List<WeatherForecastResponse.WeatherItem>> grouped = forecastResponse.getList().stream()
                 .collect(Collectors.groupingBy(item -> item.getDt_txt().substring(0, 10)));
 
         LocalDate today = LocalDate.now();
@@ -42,32 +44,29 @@ public class WeatherService {
                 .map(LocalDate::toString)
                 .toList();
 
-        List<WeatherResponse.DailyWeatherSummary> summaries = new ArrayList<>();
+        List<DailyWeatherSummary> summaries = new ArrayList<>();
 
         for (String date : targetDates) {
-            List<WeatherRequest.WeatherItem> items = grouped.get(date);
+            List<WeatherForecastResponse.WeatherItem> items = grouped.get(date);
 
-            // 오전
-            List<WeatherRequest.WeatherItem> am = items.stream()
-                    .filter(i -> getHour(i) < 12)
+            List<WeatherForecastResponse.WeatherItem> am = items.stream()
+                    .filter(i -> getHour(i) < 12) // 오전
                     .toList();
 
-            // 오후
-            List<WeatherRequest.WeatherItem> pm = items.stream()
-                    .filter(i -> getHour(i) >= 12)
+            List<WeatherForecastResponse.WeatherItem> pm = items.stream()
+                    .filter(i -> getHour(i) >= 12) // 오후
                     .toList();
 
-            WeatherResponse.HalfDayWeather amWeather;
+            HalfDayWeather amWeather;
 
-            // 오전 데이터가 없고 오늘이면, 현재 날씨로 대체하고 강수확률은 pm에서
+            // 오전 데이터가 없고 오늘이면 current API 호출, 강수확률은 pm에서
             if (date.equals(today.toString())&& am.isEmpty()) {
                 String currentUrl = BASE_CURRENT_URL + "?lat=37.5665&lon=126.9780&appid=" + API_KEY + "&units=metric&lang=kr";
-                WeatherRequest.CurrentWeather current = restTemplate.getForObject(currentUrl, WeatherRequest.CurrentWeather.class);
+                WeatherCurrentResponse current = restTemplate.getForObject(currentUrl, WeatherCurrentResponse.class);
 
-                // pm의 강수확률
                 double pop = summarizeHalfDay(pm).getPop();
 
-                amWeather = new WeatherResponse.HalfDayWeather(
+                amWeather = new HalfDayWeather(
                         current.getWeather().get(0).getMain(),
                         current.getMain().getTemp(),
                         pop
@@ -76,7 +75,7 @@ public class WeatherService {
                 amWeather = summarizeHalfDay(am);
             }
 
-            summaries.add(new WeatherResponse.DailyWeatherSummary(
+            summaries.add(new DailyWeatherSummary(
                     date,
                     amWeather,
                     summarizeHalfDay(pm)
@@ -86,17 +85,17 @@ public class WeatherService {
         return summaries;
     }
 
-    private int getHour(WeatherRequest.WeatherItem item) {
+    private int getHour(WeatherForecastResponse.WeatherItem item) {
         return Integer.parseInt(item.getDt_txt().substring(11, 13));
     }
 
-    private WeatherResponse.HalfDayWeather summarizeHalfDay(List<WeatherRequest.WeatherItem> items) {
-        if (items.isEmpty()) return new WeatherResponse.HalfDayWeather("정보 없음", 0, 0);
+    private HalfDayWeather summarizeHalfDay(List<WeatherForecastResponse.WeatherItem> items) {
+        if (items.isEmpty()) return new HalfDayWeather("정보 없음", 0, 0);
 
         double avgTemp = items.stream().mapToDouble(i -> i.getMain().getTemp()).average().orElse(0);
         double avgPop = items.stream().mapToDouble(i -> i.getPop() * 100).average().orElse(0);
         String mostCommonWeather = items.get(0).getWeather().get(0).getMain();
 
-        return new WeatherResponse.HalfDayWeather(mostCommonWeather, avgTemp, avgPop);
+        return new HalfDayWeather(mostCommonWeather, avgTemp, avgPop);
     }
 }
