@@ -32,7 +32,12 @@ public enum ErrorStatus implements BaseErrorCode {
 	PLACE_ALREADY_EXISTS(HttpStatus.CONFLICT, "2001", "이미 등록된 장소입니다."),
 	PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "2002", "존재하지 않는 장소입니다."),
 	ALREADY_PINNED(HttpStatus.BAD_REQUEST, "2003", "이미 즐겨찾기된 장소입니다."),
-	ALREADY_UNPINNED(HttpStatus.BAD_REQUEST, "2004", "이미 즐겨찾기가 해제된 장소입니다.");
+	ALREADY_UNPINNED(HttpStatus.BAD_REQUEST, "2004", "이미 즐겨찾기가 해제된 장소입니다."),
+
+	// 날씨 관련 에러
+	API_RESPONSE_EMPTY(HttpStatus.INTERNAL_SERVER_ERROR, "5000", "날씨 예보 데이터가 없습니다.");
+
+
 
 
 	private final HttpStatus httpStatus;

@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/place")
 @RequiredArgsConstructor
+@RequestMapping("/place")
 public class PlaceController {
 
     private final PlaceService placeService;
