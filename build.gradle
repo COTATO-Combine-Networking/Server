@@ -55,7 +55,10 @@ clean.doLast {
 	file(querydslDir).deleteDir()
 }
 
-bootJar {
+springBoot {
 	mainClass = 'COTATO_Combine_Networking.Networking.NetworkingApplication'
+}
+
+bootJar {
 	archiveFileName = 'Networking-0.0.1-SNAPSHOT.jar'
 }
