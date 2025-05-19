@@ -34,14 +34,14 @@ public class WeatherService {
     private String currentUrl;
 
 
-    private String buildUrl(String baseUrl) {
-        return baseUrl + "?lat=37.5665&lon=126.9780&appid=" + apiKey + "&units=metric&lang=kr";
+    private String buildUrl(String baseUrl, double lat, double lon) {
+        return baseUrl + "?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey + "&units=metric&lang=kr";
     }
 
-    public List<DailyWeatherSummary> getFiveDayForecast() {
+    public List<DailyWeatherSummary> getFiveDayForecast(double lat, double lon) {
 
         // Forecast API 호출
-        String forecastRequestUrl = buildUrl(this.forecastUrl);
+        String forecastRequestUrl = buildUrl(this.forecastUrl, lat, lon);
         WeatherForecastResponse forecastResponse = restTemplate.getForObject(forecastRequestUrl, WeatherForecastResponse.class);
 
         if (forecastResponse == null) {
@@ -80,7 +80,7 @@ public class WeatherService {
 
             // 오전 데이터가 없고 오늘이면 current API 호출, 강수확률은 pm에서
             if (date.equals(today.toString())&& am.isEmpty()) {
-                String currentRequestUrl = buildUrl(currentUrl);
+                String currentRequestUrl = buildUrl(currentUrl, lat, lon);
                 WeatherCurrentResponse currentResponse = restTemplate.getForObject(currentRequestUrl, WeatherCurrentResponse.class);
 
                 if (currentResponse == null) {
