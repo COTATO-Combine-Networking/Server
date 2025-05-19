@@ -5,10 +5,7 @@ import COTATO_Combine_Networking.Networking.domain.weather.service.WeatherServic
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +17,7 @@ public class WeatherController {
     private final WeatherService weatherService;
 
     @GetMapping("/5days")
+    @CrossOrigin(origins = "*")
     @Operation(
             summary = "5일간 날씨 예보 조회 API",
             description = """
