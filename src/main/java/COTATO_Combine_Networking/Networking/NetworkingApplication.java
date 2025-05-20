@@ -7,7 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @OpenAPIDefinition(
 		servers = {
+				//@Server(url = "http://localhost:8080", description = "Local Server"),
 				@Server(url = "http://3.133.128.168:8080", description = "Production Server"),
+
 		}
 )
 @SpringBootApplication

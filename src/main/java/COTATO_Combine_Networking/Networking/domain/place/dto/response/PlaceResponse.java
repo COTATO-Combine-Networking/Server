@@ -13,4 +13,6 @@ public class PlaceResponse {
     private Long placeId;
     private String placeName;
     private String placeAddress;
+    private String longitude;
+    private String latitude;
 }
