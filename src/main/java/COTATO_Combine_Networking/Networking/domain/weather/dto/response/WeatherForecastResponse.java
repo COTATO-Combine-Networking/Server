@@ -5,6 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -25,9 +28,11 @@ public class WeatherForecastResponse {
 
         public int getHour() {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            LocalDateTime dt = LocalDateTime.parse(this.dt_txt, formatter);
-            return dt.getHour();
+            LocalDateTime utcDateTime = LocalDateTime.parse(this.dt_txt, formatter);
+            ZonedDateTime seoulTime = utcDateTime.atZone(ZoneOffset.UTC).withZoneSameInstant(ZoneId.of("Asia/Seoul"));
+            return seoulTime.getHour();
         }
+
     }
 
     @Data
