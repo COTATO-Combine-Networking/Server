@@ -8,6 +8,8 @@ public class PlaceConverter {
     public static Place toEntity(PlaceCreateRequest request) {
         return Place.builder()
                 .placeName(request.getPlaceName())
+                .addressName(request.getPlaceName())
+                .roadAddressName(request.getRoadAddressName())
                 .latitude(request.getLatitude())
                 .longitude(request.getLongitude())
                 .build();
@@ -17,6 +19,9 @@ public class PlaceConverter {
         return PlaceResponse.builder()
                 .placeId(place.getId())
                 .placeName(place.getPlaceName())
+                .placeAddress(place.getAddressName())
+                .longitude(place.getLongitude())
+                .latitude(place.getLatitude())
                 .build();
     }
 }
