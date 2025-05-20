@@ -22,6 +22,7 @@ public class PlaceConverter {
                 .placeAddress(place.getAddressName())
                 .longitude(place.getLongitude())
                 .latitude(place.getLatitude())
+                .isPinned(place.isPinned())
                 .build();
     }
 }

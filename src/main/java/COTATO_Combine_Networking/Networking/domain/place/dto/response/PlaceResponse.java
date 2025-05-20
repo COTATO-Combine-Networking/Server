@@ -15,4 +15,5 @@ public class PlaceResponse {
     private String placeAddress;
     private String longitude;
     private String latitude;
+    private Boolean isPinned;
 }
