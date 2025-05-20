@@ -44,7 +44,7 @@ public class PlaceService {
 
     public List<PlaceResponse> findAll() {
         return placeRepository.findAll().stream()
-                .map(place -> new PlaceResponse(place.getId(), place.getPlaceName(), place.getAddressName(), place.getLongitude(), place.getLatitude()))
+                .map(place -> new PlaceResponse(place.getId(), place.getPlaceName(), place.getAddressName(), place.getLongitude(), place.getLatitude(),place.isPinned()))
                 .collect(Collectors.toList());
     }
 
