@@ -62,3 +62,7 @@ springBoot {
 bootJar {
 	archiveFileName = 'Networking-0.0.1-SNAPSHOT.jar'
 }
+
+jar{
+	enabled=false
+}
