@@ -1,5 +1,6 @@
 package COTATO_Combine_Networking.Networking.domain.weather.controller;
 
+import COTATO_Combine_Networking.Networking.domain.weather.dto.response.AirPollutionResponse;
 import COTATO_Combine_Networking.Networking.domain.weather.dto.response.DailyWeatherSummary;
 import COTATO_Combine_Networking.Networking.domain.weather.service.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,4 +38,15 @@ public class WeatherController {
     ) {
         return weatherService.getFiveDayForecast(lat, lon);
     }
+
+    @GetMapping("/air")
+    @CrossOrigin(origins = "*")
+    @Operation(summary = "대기 오염 정보 조회", description = "OpenWeather의 대기 오염 API를 통해 미세먼지 등 대기 질 정보를 조회합니다.")
+    public AirPollutionResponse getAirPollution(
+            @RequestParam double lat,
+            @RequestParam double lon
+    ) {
+        return weatherService.getAirPollution(lat, lon);
+    }
+
 }
