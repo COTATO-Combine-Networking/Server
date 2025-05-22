@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,24 +51,23 @@ public class WeatherService {
             throw new GeneralException(ErrorStatus.API_RESPONSE_EMPTY);
         }
 
-        // 날짜별로 그룹화(ex-"2025-05-20")
-        Map<String, List<WeatherForecastResponse.WeatherItem>> grouped = forecastResponse.getList().stream()
-                .collect(Collectors.groupingBy(item -> item.getDt_txt().substring(0, 10)));
+        // 서울 기준 오늘 날짜
+        LocalDate today = LocalDate.now(ZoneId.of("Asia/Seoul"));
 
-        LocalDate today = LocalDate.now();
+        // 날짜별로 그룹화 (서울 기준 날짜로)
+        Map<LocalDate, List<WeatherForecastResponse.WeatherItem>> grouped = forecastResponse.getList().stream()
+                .collect(Collectors.groupingBy(WeatherForecastResponse.WeatherItem::getKstDate));
 
         // 오늘부터 이후 5일만 필터링
-        List<String> targetDates = grouped.keySet().stream()
-                .map(LocalDate::parse)
+        List<LocalDate> targetDates = grouped.keySet().stream()
                 .filter(date -> !date.isBefore(today))
                 .sorted()
                 .limit(5)
-                .map(LocalDate::toString)
                 .toList();
 
         List<DailyWeatherSummary> summaries = new ArrayList<>();
 
-        for (String date : targetDates) {
+        for (LocalDate date : targetDates) {
             List<WeatherForecastResponse.WeatherItem> items = grouped.get(date);
 
             List<WeatherForecastResponse.WeatherItem> am = items.stream()
@@ -101,7 +101,7 @@ public class WeatherService {
             }
 
             summaries.add(new DailyWeatherSummary(
-                    date,
+                    date.toString(),
                     amWeather,
                     summarizeHalfDay(pm)
             ));
@@ -120,6 +120,7 @@ public class WeatherService {
                 averagePop(items)
         );
     }
+
 
     private String mostFrequentWeather(List<WeatherForecastResponse.WeatherItem> items) {
         return items.stream()
