@@ -2,6 +2,7 @@ package COTATO_Combine_Networking.Networking.domain.weather.controller;
 
 import COTATO_Combine_Networking.Networking.domain.weather.dto.response.AirPollutionResponse;
 import COTATO_Combine_Networking.Networking.domain.weather.dto.response.DailyWeatherSummary;
+import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherOneCallResponse;
 import COTATO_Combine_Networking.Networking.domain.weather.service.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,4 +50,13 @@ public class WeatherController {
         return weatherService.getAirPollution(lat, lon);
     }
 
+    @GetMapping("/onecall")
+    @CrossOrigin(origins = "*")
+    @Operation(summary = "현재 날씨 조회", description = "OpenWeather의 onecall API를 통해 현재 날씨, 시간별 예보 등을 제공합니다.")
+    public WeatherOneCallResponse getCurrentWeather(
+            @RequestParam double lat,
+            @RequestParam double lon
+    ) {
+        return weatherService.getCurrentWeather(lat, lon);
+    }
 }
