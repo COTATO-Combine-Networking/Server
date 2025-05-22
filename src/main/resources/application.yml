@@ -27,3 +27,4 @@ weather:
   forecast-url: https://api.openweathermap.org/data/2.5/forecast
   current-url: https://api.openweathermap.org/data/2.5/weather
   air-url: https://api.openweathermap.org/data/2.5/air_pollution
+  oneCall-Url: https://api.openweathermap.org/data/3.0/onecall

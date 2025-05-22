@@ -33,6 +33,8 @@ public class WeatherService {
     @Value("${weather.air-url}")
     private String airUrl;
 
+    @Value("${weather.oneCall-Url}")
+    private String oneCallUrl;
 
     private String buildUrl(String baseUrl, double lat, double lon) {
         return baseUrl + "?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey + "&units=metric&lang=kr";
@@ -151,6 +153,24 @@ public class WeatherService {
                 "&appid=" + apiKey;
 
         AirPollutionResponse response = restTemplate.getForObject(url, AirPollutionResponse.class);
+
+        if (response == null) {
+            throw new GeneralException(ErrorStatus.API_RESPONSE_EMPTY);
+        }
+
+        return response;
+    }
+
+    // 현재 날씨 조회
+    public WeatherOneCallResponse getCurrentWeather(double lat, double lon) {
+        String url = oneCallUrl +
+                "?lat=" + lat +
+                "&lon=" + lon +
+                "&exclude=minutely,alerts" +
+                "&appid=" + apiKey +
+                "&units=metric&lang=kr";
+
+        WeatherOneCallResponse response = restTemplate.getForObject(url, WeatherOneCallResponse.class);
 
         if (response == null) {
             throw new GeneralException(ErrorStatus.API_RESPONSE_EMPTY);
