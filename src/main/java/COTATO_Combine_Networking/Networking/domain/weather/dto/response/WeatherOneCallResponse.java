@@ -19,6 +19,12 @@ public class WeatherOneCallResponse {
     @AllArgsConstructor
     public static class Current {
         private double temp;
+        private double feels_like;
+        private int humidity;
+        private double wind_speed;
+        private int wind_deg;
+        private double uvi;
+        private long sunrise;
         private List<Weather> weather;
     }
 
@@ -28,6 +34,7 @@ public class WeatherOneCallResponse {
     public static class Weather {
         private String main;
         private String description;
+        private String icon;
     }
 
     @Data
@@ -36,6 +43,12 @@ public class WeatherOneCallResponse {
     public static class Hourly {
         private long dt;
         private double temp;
+        private double feels_like;
+        private int humidity;
+        private double wind_speed;
+        private int wind_deg;
+        private double uvi;
+        private long sunrise;
         private List<Weather> weather;
     }
 }
