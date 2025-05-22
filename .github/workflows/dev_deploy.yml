@@ -19,8 +19,9 @@ jobs:
 
       - name: Make application.yml
         run: |
-          cd ./src/main/resources
-          echo "${{ secrets.APPLICATION_YML }}" > ./application.yml
+          mkdir -p config
+          echo "${{ secrets.APPLICATION_YML }}" > config/application.yml
+          cp config/application.yml build/libs/application.yml  # JAR와 함께 업로드
         shell: bash
 
       - name: Grant execute permission for gradlew
@@ -35,7 +36,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backend
-          path: build/libs/*.jar
+          path: build/libs/
           retention-days: 1
 
   deploy:
@@ -57,11 +58,15 @@ jobs:
         run: |
           echo "$EC2_SSH_KEY" > private_key.pem
           chmod 600 private_key.pem
+          
           jar_file=$(find build/libs -name '*.jar' | head -n 1)
+          yml_file="build/libs/application.yml"
+          
           # jar 파일 전송
           scp -i private_key.pem -o StrictHostKeyChecking=no "$jar_file" $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/Networking-0.0.1-SNAPSHOT.jar
           # application.yml 전송
-          scp -i private_key.pem -o StrictHostKeyChecking=no ./src/main/resources/application.yml $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/application.yml
+          scp -i private_key.pem -o StrictHostKeyChecking=no "$yml_file" $EC2_USERNAME@$EC2_HOST:/home/$EC2_USERNAME/application.yml
+
           ssh -i private_key.pem -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_HOST "
             pgrep java | xargs -r kill -15  # 기존에 실행 중인 Java 프로세스 종료
             sleep 10
