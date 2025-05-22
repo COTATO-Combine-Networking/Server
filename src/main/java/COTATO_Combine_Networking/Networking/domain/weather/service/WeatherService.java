@@ -1,9 +1,6 @@
 package COTATO_Combine_Networking.Networking.domain.weather.service;
 
-import COTATO_Combine_Networking.Networking.domain.weather.dto.response.DailyWeatherSummary;
-import COTATO_Combine_Networking.Networking.domain.weather.dto.response.HalfDayWeather;
-import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherCurrentResponse;
-import COTATO_Combine_Networking.Networking.domain.weather.dto.response.WeatherForecastResponse;
+import COTATO_Combine_Networking.Networking.domain.weather.dto.response.*;
 import COTATO_Combine_Networking.Networking.global.apiPayload.code.status.ErrorStatus;
 import COTATO_Combine_Networking.Networking.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +29,9 @@ public class WeatherService {
 
     @Value("${weather.current-url}")
     private String currentUrl;
+
+    @Value("${weather.air-url}")
+    private String airUrl;
 
 
     private String buildUrl(String baseUrl, double lat, double lon) {
@@ -141,6 +141,22 @@ public class WeatherService {
                 .mapToDouble(i -> i.getPop() * 100) // % 변환
                 .average()
                 .orElse(0);
+    }
+
+    // 대기 오염 조회
+    public AirPollutionResponse getAirPollution(double lat, double lon) {
+        String url = airUrl +
+                "?lat=" + lat +
+                "&lon=" + lon +
+                "&appid=" + apiKey;
+
+        AirPollutionResponse response = restTemplate.getForObject(url, AirPollutionResponse.class);
+
+        if (response == null) {
+            throw new GeneralException(ErrorStatus.API_RESPONSE_EMPTY);
+        }
+
+        return response;
     }
 
 }
