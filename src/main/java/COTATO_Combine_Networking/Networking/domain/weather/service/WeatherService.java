@@ -81,7 +81,7 @@ public class WeatherService {
             HalfDayWeather amWeather;
 
             // 오전 데이터가 없고 오늘이면 current API 호출, 강수확률은 pm에서
-            if (date.equals(today.toString())&& am.isEmpty()) {
+            if (date.equals(today) && am.isEmpty()) {
                 String currentRequestUrl = buildUrl(currentUrl, lat, lon);
                 WeatherCurrentResponse currentResponse = restTemplate.getForObject(currentRequestUrl, WeatherCurrentResponse.class);
 
